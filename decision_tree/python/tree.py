@@ -2,19 +2,56 @@ import pandas as pd
 import numpy as np
 
 class decision_tree():
-    def __init__(self, df, max_depth=5):
+    def __init__(self, df, max_depth=5, indexes=[], cols_exclude=[]):
         """
         Decision Tree
 
         Args:
-            df: tupple containing x and y
+            df:        tupple containing x and y
             max_depth: maximum depth of the tree
         """
         self.__max_depth = max_depth
         self.__df = df
-        self.__root = Node(0)
+        self.__branches = []
+        self.__cols_exclude = cols_exclude
+        if len(indexes) == 0:
+            self.__indexes = np.ones(len(df[0]), dtype=bool)
+        else:
+            self.__indexes = indexes.copy()
+        print(f"depth: {5 - max_depth}")
+        print(self.__indexes)
+        
+        if max_depth > 0:
+            self.__branches = self.__branch()
 
+
+    def __branch(self):
+        branches     = []
+        disc_max     = -np.inf
+        disc_max_col = None
+
+        for col in self.__df[0].columns:
+            if col in self.__cols_exclude:
+                continue
+            disc = self.disc(col)
+            if disc > disc_max:
+                disc_max     = disc
+                disc_max_col = col
+            
+        if disc_max_col == None:
+            return branches
+            
+        uniques = np.unique(self.__df[0][disc_max_col][self.__indexes].values)
+        cols_exclude = self.__cols_exclude
+        cols_exclude.append(disc_max_col)
+        for unique in uniques:
+            indexes = (self.__df[0][disc_max_col] == unique).values
+            indexes = np.logical_and(indexes, self.__indexes)
+            branches.append(decision_tree(self.__df, self.__max_depth - 1, indexes, cols_exclude))
+            
+        return branches
     
+
     def entropy(self, col=None, val=None):
         """
         Calculates entropy of a dataset based on column and value or the dataset itself
@@ -25,14 +62,16 @@ class decision_tree():
         """
         res = 0
         if col == None:
-            uniques, counts = np.unique(self.__df[1], return_counts=True)
+            # print(len(self.__indexes))
+            # print(len(self.__df[0]))
+            uniques, counts = np.unique(self.__df[1][self.__indexes], return_counts=True)
             for val, count in zip(uniques, counts):
-                if len(self.__df[1] == val) != 0:
-                    res -= (count / len(self.__df[1]) * np.log2(count / len(self.__df[1])))
+                if len(self.__df[1][self.__indexes] == val) != 0:
+                    res -= (count / len(self.__df[1][self.__indexes]) * np.log2(count / len(self.__df[1][self.__indexes])))
         else:
-            uniques_y, counts_y = np.unique(self.__df[1], return_counts=True)
+            uniques_y, counts_y = np.unique(self.__df[1][self.__indexes], return_counts=True)
             for unique_y, count_y in zip(uniques_y, counts_y):
-                y = self.__df[0][(self.__df[1] == unique_y).values]
+                y = self.__df[0][self.__indexes][(self.__df[1][self.__indexes] == unique_y).values]
                 y = y[col][y[col] == val]
                 if len(y) != 0:
                     res -= (len(y) / count_y * np.log2(len(y) / count_y))
@@ -49,17 +88,16 @@ class decision_tree():
         """
         res = self.entropy()
         
-        uniques, counts = np.unique(self.__df[0][col], return_counts=True)
+        uniques, counts = np.unique(self.__df[0][col][self.__indexes], return_counts=True)
         for val, count in zip(uniques, counts):
-            res -= ((count / len(self.__df[0][col])) * self.entropy(col, val))
+            res -= ((count / len(self.__df[0][col][self.__indexes])) * self.entropy(col, val))
         
         return res
 
-
-class Node():
-    def __init__(self, depth):
-        self.__branches = []
-        self.__depth = depth
+    
+    def predict(self, df_x):
+        # TODO: implement the function
+        pass
 
 
 def float_to_one_hot(df, cols="all", classes_n=3):
@@ -111,8 +149,10 @@ if __name__ == "__main__":
     
     data = float_to_one_hot(data, [col for col in data.columns if col != "class"], 3)
     data, d = str_to_one_hot(data)
+
+    # print(data[np.ones(len(data), dtype=bool)])
     
-    print(data, d)
+    # print(data, d)
 
     x_cols = [col for col in data.columns if col != "class"]
     data_x = data.loc[:, x_cols]
@@ -121,5 +161,5 @@ if __name__ == "__main__":
     data_y = data.loc[:, y_cols]
     dt = decision_tree((data_x, data_y))
 
-    for col in data_x.columns:
-        print(f"{col}: {dt.disc(col)}")
+    # for col in data_x.columns:
+    #     print(f"{col}: {dt.disc(col)}")
