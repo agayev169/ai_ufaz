@@ -1,20 +1,65 @@
 import pandas as pd
+import numpy as np
 
 class decision_tree():
-    def __init__(self, data, max_depth=5):
+    def __init__(self, df, max_depth=5):
         """
         Decision Tree
 
         Args:
-            data: tupple containing x and y
+            df: tupple containing x and y
             max_depth: maximum depth of the tree
         """
         self.__max_depth = max_depth
+        self.__df = df
+        self.__root = Node(0)
+
+    
+    def entropy(self, col=None, val=None):
+        """
+        Calculates entropy of a dataset based on column and value or the dataset itself
+
+        Args:
+            col: str, default None. column to determine the entropy of. Calculates entropy of the dataset by default
+            val: value of the col column to calculate the entropy of
+        """
+        res = 0
+        if col == None:
+            uniques, counts = np.unique(self.__df[1], return_counts=True)
+            for val, count in zip(uniques, counts):
+                if len(self.__df[1] == val) != 0:
+                    res -= (count / len(self.__df[1]) * np.log2(count / len(self.__df[1])))
+        else:
+            uniques_y, counts_y = np.unique(self.__df[1], return_counts=True)
+            for unique_y, count_y in zip(uniques_y, counts_y):
+                y = self.__df[0][(self.__df[1] == unique_y).values]
+                y = y[col][y[col] == val]
+                if len(y) != 0:
+                    res -= (len(y) / count_y * np.log2(len(y) / count_y))
+
+        return res
+
+    
+    def disc(self, col):
+        """
+        Calculates discriminative power of the variable
+
+        Args:
+            col: the name of the variable to calculate the discriminative power of
+        """
+        res = self.entropy()
+        
+        uniques, counts = np.unique(self.__df[0][col], return_counts=True)
+        for val, count in zip(uniques, counts):
+            res -= ((count / len(self.__df[0][col])) * self.entropy(col, val))
+        
+        return res
 
 
 class Node():
-    def __init__(self):
-        pass
+    def __init__(self, depth):
+        self.__branches = []
+        self.__depth = depth
 
 
 def float_to_one_hot(df, cols="all", classes_n=3):
@@ -61,8 +106,8 @@ def str_to_one_hot(df, cols=["class"]):
 if __name__ == "__main__":
     data = pd.read_csv("iris_text.data", 
         names=["petal_width", "petal_length", "sepal_width", "sepal_length", "class"])
-    print(data.head())
-    print(data.describe())
+    # print(data.head())
+    # print(data.describe())
     
     data = float_to_one_hot(data, [col for col in data.columns if col != "class"], 3)
     data, d = str_to_one_hot(data)
@@ -75,4 +120,6 @@ if __name__ == "__main__":
     y_cols = ["class"]
     data_y = data.loc[:, y_cols]
     dt = decision_tree((data_x, data_y))
-    
+
+    for col in data_x.columns:
+        print(f"{col}: {dt.disc(col)}")
