@@ -172,10 +172,6 @@ class decision_tree():
                 if branch.get_rule().is_satisfied(data_x):
                     corresponding_branch = branch
                     break
-            if corresponding_branch == None:
-                for branch in self.__branches:
-                    print(branch.get_rule())
-                return 0
             return corresponding_branch.predict(data_x)
 
 
@@ -232,7 +228,8 @@ if __name__ == "__main__":
 
     data = data.values
 
-    data = float_to_one_hot(data, [0, 1, 2, 3], 10)
+    data = float_to_one_hot(data, [i for i in range(4)], 3)
+    print("Making 3 classes for each attribute")
     data, d = str_to_one_hot(data, [-1])
 
     x_cols = [i for i in range(4)]
@@ -249,6 +246,8 @@ if __name__ == "__main__":
     train_y = data_y[indexes[:100]]
     val_y   = data_y[indexes[100:]]
 
+    print(f"Training on {len(train_x)} data points, validating on {len(val_x)} data points")
+
     dt = decision_tree((train_x, train_y), 5)
 
     acc = 0
@@ -256,7 +255,5 @@ if __name__ == "__main__":
         pred = dt.predict(val_x[i].reshape(1, -1))
         if pred == val_y[i, 0]:
             acc += 1
-        else:
-            print(f"val_x[{i}]: {val_x[i]}")
 
     print(f"accuracy: {acc / len(val_x)}")
