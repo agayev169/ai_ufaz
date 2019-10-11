@@ -228,8 +228,9 @@ if __name__ == "__main__":
 
     data = data.values
 
-    data = float_to_one_hot(data, [i for i in range(4)], 3)
-    print("Making 3 classes for each attribute")
+    classes_n = 5
+    data = float_to_one_hot(data, [i for i in range(4)], classes_n)
+    print(f"Making {classes_n} classes for each attribute")
     data, d = str_to_one_hot(data, [-1])
 
     x_cols = [i for i in range(4)]
