@@ -34,7 +34,7 @@ class decision_tree():
             """
                 Returns rule as a string
             """
-            return f"col: {self.__col}\nval: {self.__val}"
+            return f"col: {self.__col}, val: {self.__val}"
 
 
     def __init__(self, data, max_depth=5, indexes="all", cols_exclude=[], rule=None):
@@ -68,6 +68,10 @@ class decision_tree():
         """
         return self.__rule_
 
+    
+    def get_data(self):
+        return self.__data
+
 
     def __branch(self):
         """
@@ -95,7 +99,7 @@ class decision_tree():
             return branches
             
         uniques = np.unique(self.__data[0][self.__indexes, disc_max_col])
-        cols_exclude = self.__cols_exclude
+        cols_exclude = [col for col in self.__cols_exclude]
         cols_exclude.append(disc_max_col)
         for unique in uniques:
             indexes = (self.__data[0][:, disc_max_col] == unique)
@@ -106,17 +110,17 @@ class decision_tree():
         return branches
     
 
-    def entropy(self, col=None, val=None):
+    def entropy(self, col=None):
         """
         Calculates entropy of a dataset based on column and value or the dataset itself
 
         Args:
             col: column to determine the entropy of. Calculates entropy of the dataset by default
-            val: value of the col column to calculate the entropy of
 
         Returns:
             entropy as float
         """
+
         res = 0
         if col == None:
             uniques, counts = np.unique(self.__data[1][self.__indexes], return_counts=True)
@@ -125,12 +129,16 @@ class decision_tree():
                     res -= (count / len(self.__data[1][self.__indexes]) * np.log2(count / len(self.__data[1][self.__indexes])))
         else:
             uniques_y, counts_y = np.unique(self.__data[1][self.__indexes], return_counts=True)
-            for unique_y, count_y in zip(uniques_y, counts_y):
-                y = self.__data[0][np.logical_and(self.__indexes, (self.__data[1] == [unique_y]).reshape(-1))]
-                y = y[:, col][y[:, col] == val]
-                if len(y) != 0:
-                    res -= (len(y) / count_y * np.log2(len(y) / count_y))
+            uniques_x, counts_x = np.unique(self.__data[0][self.__indexes, col], return_counts=True)
+            for unique_x, count_x in zip(uniques_x, counts_x):
+                y_indexes = np.logical_and(self.__indexes, (self.__data[0][:, col].reshape(-1) == [unique_x]))
+                e = 0
+                for unique_y, count_y in zip(uniques_y, counts_y):
+                    y = self.__data[1][np.logical_and(y_indexes, (self.__data[1].reshape(-1) == [unique_y]))]
+                    if len(y) != 0:
+                        e += len(y) / count_x * np.log2(len(y) / count_x) 
 
+                res -= (count_x / len(self.__indexes) * e)
         return res
 
     
@@ -144,12 +152,8 @@ class decision_tree():
         Returns:
             discriminative power as float
         """
-        res = self.entropy()
-        
-        uniques, counts = np.unique(self.__data[0][self.__indexes, col], return_counts=True)
-        for val, count in zip(uniques, counts):
-            res -= ((count / len(self.__data[0][self.__indexes, col])) * self.entropy(col, val))
-        
+        res = self.entropy() - self.entropy(col)
+
         return res
 
     
@@ -172,6 +176,10 @@ class decision_tree():
                 if branch.get_rule().is_satisfied(data_x):
                     corresponding_branch = branch
                     break
+            if corresponding_branch == None:
+                # No such data point was detected before
+                # TODO: Do K-Means in order to find an appropriate result
+                return 0
             return corresponding_branch.predict(data_x)
 
 
@@ -193,7 +201,7 @@ def float_to_one_hot(data, cols="all", classes_n=3):
         cols = [col for col in range(data.shape[1])]
     data = data.copy()
     for col in cols:
-        data[:, col] = np.sort(data[:, col])
+        data = data[data[:, col].argsort()]
         for cl in range(classes_n):
             data[cl * len(data) // classes_n : (cl + 1) * len(data) // classes_n, col] = cl
     return data
