@@ -50,13 +50,14 @@ class decision_tree():
             rule:        rule that defines the decision tree
             groups:      maximum values of the data points to be included in the ith group
         """
-        self.__rule_ = rule
-        self.__max_depth = max_depth
-        self.__data = data
-        self.__branches = []
+        self.__rule_        = rule
+        self.__max_depth    = max_depth
+        self.__data         = data
+        self.__branches     = []
         self.__cols_exclude = cols_exclude
-        self.__n_groups = n_groups
-        self.__groups = groups
+        self.__n_groups     = n_groups
+        self.__groups       = groups
+
         if isinstance(indexes, str) and indexes == "all":
             self.__indexes = np.ones(len(data[0]), dtype=bool)
         else:
