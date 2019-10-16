@@ -179,6 +179,9 @@ if __name__ == "__main__":
     axs[0, 5].set_xlabel("sepal_width")
     axs[0, 5].set_ylabel("sepal_height")
 
+    for i in range(6):
+        axs[0, i].set_title("real")
+
 
     labels_unique = np.unique(out)
 
@@ -202,6 +205,9 @@ if __name__ == "__main__":
     axs[1, 4].set_ylabel("sepal_height")
     axs[1, 5].set_xlabel("sepal_width")
     axs[1, 5].set_ylabel("sepal_height")
+
+    for i in range(6):
+        axs[1, i].set_title("predictions")
 
     plt.show()
 

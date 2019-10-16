@@ -6,3 +6,6 @@ This repository contains source codes written during my study at French-Azerbaij
 ## Available algorithms:
 * [Decision Tree](./decision_tree/)
     * [in Python 3](./decision_tree/python/)
+
+* [K-Means](./k_means/)
+    * [in Python 3](./k_means/python/)
