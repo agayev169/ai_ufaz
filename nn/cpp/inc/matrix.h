@@ -15,11 +15,17 @@ public:
     std::vector<T> operator[](const uint32_t row) const;
     matrix<T> operator=(const matrix &m);
     matrix<T> operator+(const matrix &m) const;
+    matrix<T> operator+(const T &c) const;
     matrix<T> operator+=(const matrix &m);
+    matrix<T> operator+=(const T &c);
     matrix<T> operator-(const matrix &m) const;
+    matrix<T> operator-(const T &c) const;
     matrix<T> operator-=(const matrix &m);
+    matrix<T> operator-=(const T &c);
     matrix<T> operator*(const matrix &m) const;
+    matrix<T> operator*(const T &c) const;
     matrix<T> operator*=(const matrix &m);
+    matrix<T> operator*=(const T &c);
     matrix<T> operator^(const matrix &m) const;
     matrix<T> operator^=(const matrix &m);
     bool operator==(const matrix &m);
@@ -33,6 +39,8 @@ public:
     static matrix<double> identity(uint32_t n);
     matrix<T> matmul(const matrix &m) const;
     static matrix<T> matmul(const matrix &m1, const matrix &m2);
+    static matrix<T> trasnpose(const matrix<T> &m);
+    matrix<T> trasnpose() const;
 };
 
 template <typename T>

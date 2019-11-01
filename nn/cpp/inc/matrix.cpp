@@ -63,6 +63,20 @@ matrix<T> matrix<T>::operator+(const matrix &m) const {
 }
 
 template <typename T>
+matrix<T> matrix<T>::operator+(const T &c) const {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            res = c + data_[i][j];
+        }
+    }
+
+    return res;
+}
+
+template <typename T>
 matrix<T> matrix<T>::operator+=(const matrix<T> &m) {
     auto sh1 = m.shape();
     auto sh2 = shape();
@@ -71,6 +85,20 @@ matrix<T> matrix<T>::operator+=(const matrix<T> &m) {
     for (uint32_t i = 0; i < sh1[0]; ++i) {
         for (uint32_t j = 0; j < sh1[1]; ++j) {
             data_[i][j] += m[i][j];
+        }
+    }
+
+    return *this;
+}
+
+template <typename T>
+matrix<T> matrix<T>::operator+=(const T &c) {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            data_[i][j] += c;
         }
     }
 
@@ -94,6 +122,20 @@ matrix<T> matrix<T>::operator-(const matrix<T> &m) const {
 }
 
 template <typename T>
+matrix<T> matrix<T>::operator-(const T &c) const {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            res = data_[i][j] - c;
+        }
+    }
+
+    return res;
+}
+
+template <typename T>
 matrix<T> matrix<T>::operator-=(const matrix<T> &m) {
     auto sh1 = m.shape();
     auto sh2 = shape();
@@ -102,6 +144,20 @@ matrix<T> matrix<T>::operator-=(const matrix<T> &m) {
     for (uint32_t i = 0; i < sh1[0]; ++i) {
         for (uint32_t j = 0; j < sh1[1]; ++j) {
             data_[i][j] -= m[i][j];
+        }
+    }
+
+    return *this;
+}
+
+template <typename T>
+matrix<T> matrix<T>::operator-=(const T &c) {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            data_[i][j] -= c;
         }
     }
 
@@ -125,6 +181,20 @@ matrix<T> matrix<T>::operator*(const matrix<T> &m) const {
 }
 
 template <typename T>
+matrix<T> matrix<T>::operator*(const T &c) const {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            res = data_[i][j] * c;
+        }
+    }
+
+    return res;
+}
+
+template <typename T>
 matrix<T> matrix<T>::operator*=(const matrix<T> &m) {
     auto sh1 = m.shape();
     auto sh2 = shape();
@@ -133,6 +203,20 @@ matrix<T> matrix<T>::operator*=(const matrix<T> &m) {
     for (uint32_t i = 0; i < sh1[0]; ++i) {
         for (uint32_t j = 0; j < sh1[1]; ++j) {
             data_[i][j] *= m[i][j];
+        }
+    }
+
+    return *this;
+}
+
+template <typename T>
+matrix<T> matrix<T>::operator*=(const T &c) {
+    auto sh = shape();
+
+    matrix<T> res(sh[0], sh[1]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            data_[i][j] *= c;
         }
     }
 
@@ -260,6 +344,34 @@ matrix<T> matrix<T>::matmul(const matrix<T> &m) const {
 template <typename T>
 matrix<T> matrix<T>::matmul(const matrix<T> &m1, const matrix<T> &m2) {
     return m1 ^ m2;
+}
+
+template <typename T>
+matrix<T> matrix<T>::trasnpose(const matrix<T> &m) {
+    auto sh = m.shape();
+
+    matrix<T> res = matrix(sh[1], sh[0]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            res[i][j] = m[j][i];
+        }
+    }
+
+    return res;
+}
+
+template <typename T>
+matrix<T> matrix<T>::trasnpose() const {
+    auto sh = shape();
+
+    matrix<T> res = matrix(sh[1], sh[0]);
+    for (uint32_t i = 0; i < sh[0]; ++i) {
+        for (uint32_t j = 0; j < sh[1]; ++j) {
+            res[i][j] = data_[j][i];
+        }
+    }
+
+    return res;
 }
 
 template <typename T>
