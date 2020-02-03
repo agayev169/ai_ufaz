@@ -9,3 +9,4 @@ This repository contains source codes written during my study at French-Azerbaij
 
 * [K-Means](./k_means/)
     * [in Python 3](./k_means/python/)
+    * [in C++](./k_means/cpp/)

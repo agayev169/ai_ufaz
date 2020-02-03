@@ -21,3 +21,4 @@ To identify initial centroids one may use one of the two following approaches:
 ---
 ## Implementations:
 * [Python 3](./python/)
+* [C++](./cpp/)
